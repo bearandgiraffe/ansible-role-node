@@ -1,7 +1,7 @@
-Role Name
+Node
 =========
 
-Role to install NodeJS.
+Installs NodeJS.
 
 Requirements
 ------------
