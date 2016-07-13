@@ -1,2 +1,9 @@
 ---
-# tasks file for ansible-role-node
+# Install specified node requirements.
+- name: Install global node packages
+  npm: name={{ item }} global=yes
+  with_items:
+    - node
+    - grunt-cli
+    - bower
+  become: yes
