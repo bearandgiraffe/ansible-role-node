@@ -1,9 +1,71 @@
 ---
+# Install Node
+- name: Add Nodesource apt key
+  apt_key:
+    url: https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x1655A0AB68576280
+    id: "68576280"
+    state: present
+
+- name: Add NodeSource repositories for NodeJS
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  with_items:
+    - "deb https://deb.nodesource.com/node_{{ nodejs_version }}.x {{ ansible_distribution_release }} main"
+    - "deb-src https://deb.nodesource.com/node_{{ nodejs_version }}.x {{ ansible_distribution_release }} main"
+  register: node_repo
+
+- name: Update APT cache
+  apt:
+    update_cache: yes
+
+- name: Install NodeJS
+  apt: name={{ item }}
+  with_items:
+    - nodejs
+  become: yes
+
+- name: Link the nodejs binary to the node command
+  file:
+    src: /usr/bin/nodejs
+    dest: /usr/bin/node
+    state: link
+  become: yes
+
 # Install specified node requirements.
 - name: Install global node packages
   npm: name={{ item }} global=yes
   with_items:
-    - node
     - grunt-cli
     - bower
+  become: yes
+
+# Install Yarn
+- name: "Yarn | GPG"
+  apt_key:
+    url: https://dl.yarnpkg.com/debian/pubkey.gpg
+    state: present
+
+- name: "Yarn | Ensure Debian sources list file exists"
+  file:
+    path: /etc/apt/sources.list.d/yarn.list
+    owner: root
+    mode: 0644
+    state: touch
+
+- name: "Yarn | Ensure Debian package is in sources list"
+  lineinfile:
+    dest: /etc/apt/sources.list.d/yarn.list
+    regexp: 'deb http://dl.yarnpkg.com/debian/ stable main'
+    line: 'deb http://dl.yarnpkg.com/debian/ stable main'
+    state: present
+
+- name: "Yarn | Update APT cache"
+  apt:
+    update_cache: yes
+
+- name: Install yarn
+  apt: name={{ item }} state=installed update_cache=yes cache_valid_time=3600
+  with_items:
+    - yarn
   become: yes

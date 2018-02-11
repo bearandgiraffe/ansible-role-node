@@ -17,5 +17,6 @@ galaxy_info:
     - development
     - node
     - javascript
+    - yarn
 
 dependencies: []
