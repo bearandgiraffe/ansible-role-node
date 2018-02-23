@@ -20,9 +20,7 @@
     update_cache: yes
 
 - name: Install NodeJS
-  apt: name={{ item }}
-  with_items:
-    - nodejs
+  apt: "name=nodejs={{ nodejs_version }}* state=present"
   become: yes
 
 - name: Link the nodejs binary to the node command
