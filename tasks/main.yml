@@ -23,11 +23,15 @@
   apt: "name=nodejs={{ nodejs_version }}* state=present"
   become: yes
 
+- stat: path=/usr/bin/node
+  register: node_bin
+
 - name: Link the nodejs binary to the node command
   file:
     src: /usr/bin/nodejs
     dest: /usr/bin/node
     state: link
+  when: node_bin.stat.exists == False
   become: yes
 
 # Install specified node requirements.
